@@ -1,0 +1,13 @@
+Question 1 : Écrire une requête qui affiche tous les couples (employee,manager) où manager est l’identifiant d’un
+chef direct ou indirect de l’employé d’identifiant employee
+
+Solution :
+
+    with recursive employ_manag(employee_id, manager_id) as (
+      select employee_id, manager_id from employees where manager_id is not null
+      union
+      select e.employee_id, employ_manag.manager_id from employees as e, employ_manag where e.manager_id = employ_manag.employee_id
+    )
+    select * from employ_manag order by employee_id;
+    
+    
