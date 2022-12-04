@@ -31,3 +31,28 @@ from employees AS e
               on e.employee_id = emp.employee_id
          JOIN employees as e2 on e2.employee_id = emp.manager_id
 order by e.last_name;
+
+
+-- Question 3 : Écrire une requête qui affiche tous les triplets (employee, manager, distance) où 
+-- manager est le nom d’un chef direct ou indirect de l’employé de nom employee et 
+-- distance est la distance hiérarchique entre les deux (1 pour un chef direct, 2 pour le chef direct du chef direct, etc.).
+
+-- Solution :
+
+WITH RECURSIVE employ_manag(employee_id, manager_id, distance) AS
+                   (
+                       SELECT employee_id, manager_id, 1
+                       FROM employees as e
+                       WHERE e.manager_id is not null
+                       UNION
+                       SELECT e.employee_id, em.manager_id, em.distance + 1
+                       FROM employees as e,
+                            employ_manag as em
+                       WHERE e.manager_id = em.employee_id
+                   )
+select e.last_name, e2.last_name, emp.distance
+from employees AS e
+         JOIN employ_manag as emp
+              on e.employee_id = emp.employee_id
+         JOIN employees as e2 on e2.employee_id = emp.manager_id
+order by e.last_name;
