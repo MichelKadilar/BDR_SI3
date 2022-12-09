@@ -166,3 +166,27 @@ GROUP BY
                     (r.region_name),
     ()
     );
+    
+    
+-- Question 5 :
+
+SELECT COALESCE(r.region_name, 'Toutes les regions : ' || STRING_AGG(DISTINCT r.region_name, ',')),
+       COALESCE(c.country_name, 'Tous les pays : ' || STRING_AGG(DISTINCT c.country_name, ',')),
+       COALESCE(l.city, 'Toutes les villes : ' || STRING_AGG(DISTINCT l.city, ',')),
+       string_agg(DISTINCT d.department_name, '-') noms_departements,
+       COUNT(DISTINCT d.department_id),
+       COUNT(*)
+FROM regions as r
+         JOIN countries as c on r.region_id = c.region_id
+         JOIN locations l on c.country_id = l.country_id
+         JOIN departments d on l.location_id = d.location_id
+         JOIN employees e on d.department_id = e.department_id
+GROUP BY
+    GROUPING SETS ( (r.region_name, c.country_name, l.city),
+                    (r.region_name, c.country_name),
+                    (r.region_name),
+    ()
+    );
+    
+    
+    Fait en écoutant l'intégralité des albums de NTM
