@@ -115,3 +115,19 @@ FROM regions as r
          JOIN departments d on l.location_id = d.location_id
          JOIN employees e on d.department_id = e.department_id
 GROUP BY r.region_name, c.country_name, l.city;
+
+
+-- Question 2 :
+
+SELECT r.region_name, c.country_name, l.city, COUNT(DISTINCT d.department_id), COUNT(*)
+FROM regions as r
+         JOIN countries c on r.region_id = c.region_id
+         JOIN locations l on c.country_id = l.country_id
+         JOIN departments d on l.location_id = d.location_id
+         JOIN employees e on d.department_id = e.department_id
+GROUP BY
+    GROUPING SETS ( (r.region_name, c.country_name, l.city),
+                    (r.region_name, c.country_name),
+                    (r.region_name),
+                    ()
+    );
