@@ -272,5 +272,18 @@ FROM employees as e
 ORDER BY d.department_id, e.salary, e.last_name;
 
 
+-- Question 10 :
+
+SELECT department_name, first_name, last_name, salary
+FROM (SELECT d.department_name,
+             e.first_name,
+             e.last_name,
+             e.salary,
+             row_number() over (PARTITION BY e.department_id ORDER BY d.department_id, e.salary DESC) row_num
+      FROM employees as e
+               JOIN departments d on d.department_id = e.department_id) as s2
+where s2.row_num = 3
+ORDER BY salary desc;
+
    
    Cordialement, La Direction
