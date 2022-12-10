@@ -286,4 +286,23 @@ where s2.row_num = 3
 ORDER BY salary desc;
 
    
+
+-- Question 12 :
+
+-- Attention, une simple soustraction entre les deux lignes ne marche pas
+-- (par rapport à l'affichage de 0 quand la différence est nulle), car en SQL : nombre - NULL = NULL
+
+SELECT department_name, last_name, salary, lag, diff
+FROM (SELECT d.department_name,
+             e.last_name,
+             e.salary,
+             LAG(e.salary, 1) OVER (PARTITION BY e.department_id ORDER BY e.salary)                             as lag,
+             COALESCE(e.salary - LAG(e.salary, 1) over (PARTITION BY e.department_id ORDER BY e.salary ASC), 0) as diff
+      FROM employees as e
+               JOIN departments d on d.department_id = e.department_id) as s2
+where s2.diff < 300
+   or (s2.lag is null)
+ORDER BY department_name;
+
+
    Cordialement, La Direction
