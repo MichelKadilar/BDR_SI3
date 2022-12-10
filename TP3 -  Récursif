@@ -216,5 +216,44 @@ GROUP BY
     
     
     
-    
-    Fait en écoutant l'intégralité des albums de NTM
+-- Question 7 :
+
+SELECT COALESCE(r.region_name, 'Toutes les regions : ' || STRING_AGG(DISTINCT r.region_name, ',')),
+       COALESCE(c.country_name, 'Tous les pays : ' || STRING_AGG(DISTINCT c.country_name, ',')),
+       COALESCE(l.city, 'Toutes les villes : ' || STRING_AGG(DISTINCT l.city, ',')),
+       CASE COUNT(DISTINCT d.department_name)
+           WHEN 1 THEN 'un departement : '
+           ELSE COUNT(DISTINCT d.department_name) || ' departements : '
+           END
+           || string_agg(DISTINCT d.department_name, '-') as noms_departements,
+       COUNT(DISTINCT d.department_id),
+       COUNT(*)
+FROM regions as r
+         JOIN countries as c on r.region_id = c.region_id
+         JOIN locations l on c.country_id = l.country_id
+         JOIN departments d on l.location_id = d.location_id
+         JOIN employees e on d.department_id = e.department_id
+GROUP BY
+    CUBE (r.region_name, c.country_name, l.city);
+
+-- EXPLICATION CUBE :
+-- CUBE permet de générer toutes les "combinaisons" (à ne pas prendre au sens mathématiques) possibles
+-- avec les paramètres qu'on lui passe. Autrement dit :
+-- Si on lui donne : (1 2 3)
+-- il générera : (1 2 3),
+-- (1 2 null), (1 null 3), (null 2 3),
+-- (1 null null), (null 2 null), (null null 3),
+-- (null null null)
+
+-- Est-ce que c'est ce que nous voulons ici ?
+-- Non, car nous n'utilisions pas TOUTES les combinaisons des trois colonnes données dans les grouping sets.
+-- On n'en utilisait que 4, là où CUBE va générer 9 combinaisons différentes.
+
+
+-- Question 8 :
+
+SELECT e.first_name, e.last_name, d.department_name, e.salary, MAX(e.salary) OVER(PARTITION BY e.department_id)
+FROM employees as e
+         JOIN departments d on d.department_id = e.department_id;
+   
+   Cordialement, La Direction
