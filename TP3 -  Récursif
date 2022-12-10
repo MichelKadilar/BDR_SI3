@@ -305,4 +305,94 @@ where s2.diff < 300
 ORDER BY department_name;
 
 
+--------------------------------------------------------- EXERCICE 3 -----------------------------------------------------------------------
+
+-- Question 1 :
+
+-- a)
+
+SELECT *
+from salary_changes;
+
+-- b)
+
+UPDATE employees
+SET salary = salary + 200
+WHERE last_name = 'King'
+  and first_name = 'Steven';
+
+-- c)
+
+SELECT *
+from salary_changes;
+
+-- d)
+
+UPDATE employees
+SET salary = salary + 100
+WHERE last_name = 'King'
+  and first_name = 'Steven';
+
+-- e)
+
+SELECT *
+from salary_changes;
+
+
+-- Question 2 :
+
+-- Pas sûr de comprendre de ce qu'il faut faire
+
+
+-- Question 3 :
+
+
+CREATE OR REPLACE FUNCTION check_salary() RETURNS trigger AS
+$check_salary$
+DECLARE
+    j_id int;
+BEGIN
+    j_id = NEW.job_id;
+    raise notice 'Value: %', NEW.first_name;
+    -- Verifie que le salaire n'est pas null
+    IF NEW.salary IS NULL THEN
+        RAISE EXCEPTION 'le salaire d''un employe ne peut pas être NULL'; -- La double ' n'est pas une erreur,
+    -- c'est pour afficher l'apostrophe
+    END IF;
+    -- Le salaire de l'employé à ajouter ne doit être inférieur au minimum de la profession (cf. table JOBS)
+    IF NEW.salary < (SELECT min_salary FROM jobs as j WHERE j.job_id = j_id) THEN
+        RAISE EXCEPTION '% ne peut pas avoir un salaire inferieur au minimum de la profession', NEW.last_name;
+    END IF;
+    -- Le salaire de l'employé à ajouter ne doit être supérieur au maximum de la profession (c'est pas moi qui le dit)
+    -- (cf. table JOBS)
+    IF NEW.salary > (SELECT max_salary FROM jobs as j WHERE j.job_id = j_id) THEN
+        RAISE EXCEPTION '% ne peut pas avoir un salaire superieur au maximum de la profession', NEW.last_name;
+    END IF;
+    RETURN NEW;
+END ;
+$check_salary$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER check_salary
+    BEFORE INSERT OR UPDATE
+    ON employees
+    FOR EACH ROW
+EXECUTE FUNCTION check_salary();
+
+
+-- TEST DU TRIGGER :
+
+UPDATE employees
+SET salary = 100000
+WHERE last_name = 'Kochhar'
+  and first_name = 'Neena'; -- DEVRAIT LEVER UNE EXCEPTION "Salaire ne peut pas être supérieur au maximum..."
+
+UPDATE employees
+SET salary = -500
+WHERE last_name = 'Kochhar'
+  and first_name = 'Neena'; -- DEVRAIT LEVER UNE EXCEPTION "Salaire ne peut pas être inférieur au minimum..."
+
+  UPDATE employees
+SET salary = 20000
+WHERE last_name = 'Kochhar'
+  and first_name = 'Neena'; -- OK
    Cordialement, La Direction
