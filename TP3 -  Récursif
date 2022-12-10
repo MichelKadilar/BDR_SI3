@@ -255,5 +255,22 @@ GROUP BY
 SELECT e.first_name, e.last_name, d.department_name, e.salary, MAX(e.salary) OVER(PARTITION BY e.department_id)
 FROM employees as e
          JOIN departments d on d.department_id = e.department_id;
+         
+
+-- Question 9 :
+
+-- Dans la table de "solution" de la prof, elle a inversé certaines choses et n'a pas le même ordre qu'elle demande dans la question...
+-- Voici une solution qui donne le bon résultat, en oubliant son ordre de sortie et l'ordre des colonnes...
+
+SELECT d.department_name,
+       e.last_name,
+       e.salary,
+       LEAD(e.salary, 1) OVER (PARTITION BY e.department_id ORDER BY e.salary),
+       LAG(e.salary, 1) OVER (PARTITION BY e.department_id ORDER BY e.salary)
+FROM employees as e
+         JOIN departments d on d.department_id = e.department_id
+ORDER BY d.department_id, e.salary, e.last_name;
+
+
    
    Cordialement, La Direction
