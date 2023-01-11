@@ -108,6 +108,14 @@ order by emp.distance desc;
 
 -- Question 1 :
 
+-- COUNT(param) permet de compter un nombre de lignes parmi un résultat.
+-- COUNT(*) signifie qu'on va compter "toutes les lignes" de notre résultat.
+-- COUNT(DISCTINCT colonne) signifie qu'on va compter toutes les lignes différentes d'une certaine colonne dans notre résultat.
+-- REMARQUE : Si jamais il y a un GROUP BY dans la requête, COUNT prend un sens un peu différent.
+-- Par exemple, dans la requête ci-dessous, GROUP BY va compter le nombre de lignes PAR GROUPEMENT.
+-- Ainsi, COUNT aura un résultat ne correspondant pas à toute la table résultat renvoyée,
+-- mais correspondra POUR CHAQUE GROUPEMENT, AU NOMBRE DE LIGNES de la table résultante DE CE GROUPEMENT.
+
 SELECT r.region_name, c.country_name, l.city, COUNT(DISTINCT d.department_id), COUNT(*)
 FROM regions as r
          JOIN countries c on r.region_id = c.region_id
